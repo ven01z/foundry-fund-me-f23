@@ -4,7 +4,7 @@ This is a beginner Solidity project built while following the [Cyfrin Updraft Fo
 
 The project demonstrates how to create, test, deploy, and interact with a simple crowdfunding smart contract using Solidity and Foundry.
 
-> This repository documents my progress while learning smart contract development. It is an educational project and has not been audited.
+> This repository documents my progress while learning smart contract development. It is an educational project.
 
 ## Table of Contents
 
