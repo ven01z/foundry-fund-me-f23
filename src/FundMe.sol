@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 // Note: The AggregatorV3Interface might be at a different location than what was in the video!
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
-import {PriceConverter} from "./PriceConverter.sol";  
+import {PriceConverter} from "./PriceConverter.sol";
 
 error FundMe__NotOwner();
 
@@ -24,9 +24,8 @@ contract FundMe {
     }
 
     function fund() public payable {
-        require(msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD,
-         "You need to spend more ETH!");
-        // require(PriceConverter.getConversionRate(msg.value) >= MINIMUM_USD, 
+        require(msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD, "You need to spend more ETH!");
+        // require(PriceConverter.getConversionRate(msg.value) >= MINIMUM_USD,
         // "You need to spend more ETH!");
         s_addressToAmountFunded[msg.sender] += msg.value;
         s_funders.push(msg.sender);
@@ -44,26 +43,22 @@ contract FundMe {
 
     function cheaperWithdraw() public onlyOwner {
         uint256 fundersLength = s_funders.length;
-        for (uint256 funderIndex = 0; 
-        funderIndex < fundersLength; 
-        funderIndex++
-        ) {
+        for (uint256 funderIndex = 0; funderIndex < fundersLength; funderIndex++) {
             address funder = s_funders[funderIndex];
-            s_addressToAmountFunded[funder] = 0; 
+            s_addressToAmountFunded[funder] = 0;
         }
         s_funders = new address[](0); // this line resets the s_funders array to an empty array, effectively clearing the list of funders. This is done to prepare for future funding rounds and to ensure that the contract's state is reset after a withdrawal. By creating a new empty array, we avoid leaving any residual data from previous funders, which could lead to confusion or errors in future interactions with the contract.
-        (bool callSuccess,) = payable(msg.sender).call{ // This line initiates a low-level call to transfer the entire balance of the contract to the address of the caller (msg.sender). The call is made using the call method, which allows for more flexibility in sending Ether compared to transfer or send. The value being sent is specified as address(this).balance, which represents the total balance of the contract. The result of the call (success or failure) is captured in the callSuccess variable, and any returned data is ignored (hence the empty comma).
-            value: address(this).balance 
-            }("");
+        (bool callSuccess,) = payable(msg.sender)
+        .call{ // This line initiates a low-level call to transfer the entire balance of the contract to the address of the caller (msg.sender). The call is made using the call method, which allows for more flexibility in sending Ether compared to transfer or send. The value being sent is specified as address(this).balance, which represents the total balance of the contract. The result of the call (success or failure) is captured in the callSuccess variable, and any returned data is ignored (hence the empty comma).
+            value: address(this).balance
+        }(
+            ""
+        );
         require(callSuccess, "Call failed");
     }
 
     function withdraw() public onlyOwner {
-        for (
-            uint256 funderIndex = 0;
-            funderIndex < s_funders.length;
-            funderIndex++
-        ) {
+        for (uint256 funderIndex = 0; funderIndex < s_funders.length; funderIndex++) {
             address funder = s_funders[funderIndex];
             s_addressToAmountFunded[funder] = 0;
         }
@@ -76,9 +71,7 @@ contract FundMe {
         // require(sendSuccess, "Send failed");
 
         // call
-        (bool callSuccess,) = payable(msg.sender).call{
-            value: address(this).balance
-            }("");
+        (bool callSuccess,) = payable(msg.sender).call{value: address(this).balance}("");
         require(callSuccess, "Call failed");
     }
     // Explainer from: https://solidity-by-example.org/fallback/
@@ -105,9 +98,7 @@ contract FundMe {
      * View / Pure functions (Getters)
      */
 
-    function getAddressToAmountFunded(
-        address fundingAddress
-    ) external view returns (uint256) {
+    function getAddressToAmountFunded(address fundingAddress) external view returns (uint256) {
         return s_addressToAmountFunded[fundingAddress];
     }
 
@@ -119,7 +110,6 @@ contract FundMe {
         return i_owner;
     }
 }
-
 
 // Concepts we didn't cover yet (will cover in later sections)
 // 1. Enum
