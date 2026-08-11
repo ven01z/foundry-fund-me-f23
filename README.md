@@ -115,13 +115,13 @@ If Foundry is not installed, follow the official installation guide:
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git
+git clone https://github.com/ven01z/foundry-fund-me-f23.git
 ```
 
 Enter the project folder:
 
 ```bash
-cd YOUR_REPOSITORY_NAME
+cd foundry-fund-me-f23
 ```
 
 Install the dependencies:
