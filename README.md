@@ -1,14 +1,56 @@
 # Foundry Fund Me
 
-This is a beginner Solidity project built while following the Cyfrin Updraft Foundry Fund Me course.
+This is a beginner Solidity project built while following the [Cyfrin Updraft Foundry Fund Me course](https://updraft.cyfrin.io/courses/foundry/foundry-fund-me).
 
-The project teaches how to create, test, deploy, and interact with a simple crowdfunding smart contract using Solidity and Foundry.
+The project demonstrates how to create, test, deploy, and interact with a simple crowdfunding smart contract using Solidity and Foundry.
 
-## What Does FundMe Do?
+> This repository documents my progress while learning smart contract development. It is an educational project and has not been audited.
 
-The `FundMe` contract allows users to send ETH to the contract.
+## Table of Contents
 
-Before accepting the funds, the contract checks whether the contribution is worth at least a minimum amount in USD. It uses a Chainlink price feed to convert the value of ETH into USD.
+- [Foundry Fund Me](#foundry-fund-me)
+  - [Table of Contents](#table-of-contents)
+  - [About](#about)
+  - [What I Learned](#what-i-learned)
+  - [Project Structure](#project-structure)
+  - [Folder Explanation](#folder-explanation)
+    - [`src/`](#src)
+    - [`script/`](#script)
+    - [`test/`](#test)
+    - [`lib/`](#lib)
+  - [Getting Started](#getting-started)
+  - [Requirements](#requirements)
+  - [Quickstart](#quickstart)
+    - [Installing Dependencies](#installing-dependencies)
+  - [Usage](#usage)
+  - [Build the Project](#build-the-project)
+  - [Testing](#testing)
+    - [Unit Tests](#unit-tests)
+    - [Integration Tests](#integration-tests)
+  - [Test Coverage](#test-coverage)
+  - [Deploy Locally](#deploy-locally)
+  - [Interaction Scripts](#interaction-scripts)
+    - [Fund the Contract](#fund-the-contract)
+    - [Withdraw the Funds](#withdraw-the-funds)
+  - [Interacting with Cast](#interacting-with-cast)
+  - [Deploying to a Testnet](#deploying-to-a-testnet)
+    - [Create Environment Variables](#create-environment-variables)
+    - [Load Environment Variables](#load-environment-variables)
+    - [Get Testnet ETH](#get-testnet-eth)
+    - [Deploy and Verify](#deploy-and-verify)
+  - [Gas Snapshots](#gas-snapshots)
+  - [Chisel](#chisel)
+  - [Formatting](#formatting)
+  - [Security Notes](#security-notes)
+  - [Protecting Secrets](#protecting-secrets)
+  - [Course Reference](#course-reference)
+  - [License](#license)
+
+## About
+
+The `FundMe` contract allows users to send ETH to the contract as a donation.
+
+Before accepting a donation, the contract checks whether the ETH sent is worth at least a minimum amount in USD. It uses a Chainlink price feed to calculate the current ETH/USD value.
 
 The contract also:
 
@@ -17,7 +59,7 @@ The contract also:
 - Allows only the owner to withdraw the funds.
 - Resets the funding records after withdrawal.
 
-> This project is for learning purposes and has not been audited.
+This project uses mock price feeds during local testing so that the tests do not need to connect to a live Chainlink contract.
 
 ## What I Learned
 
@@ -25,14 +67,16 @@ While building this project, I learned about:
 
 - Solidity smart contracts.
 - Payable functions.
-- ETH transfers.
+- Sending and receiving ETH.
 - Contract ownership.
 - Chainlink price feeds.
+- Libraries in Solidity.
 - Unit testing with Foundry.
 - Integration testing.
 - Foundry cheatcodes.
 - Deployment scripts.
 - Interaction scripts.
+- Mock contracts.
 - Local testing with Anvil.
 - Gas snapshots.
 - Chisel, Foundry's Solidity command-line tool.
@@ -59,6 +103,7 @@ While building this project, I learned about:
 │   └── mocks/
 │       └── MockV3Aggregator.sol
 │
+├── lib/
 ├── foundry.toml
 ├── foundry.lock
 ├── Makefile
@@ -68,49 +113,64 @@ While building this project, I learned about:
 
 ## Folder Explanation
 
-### `src`
+### `src/`
 
 This folder contains the main smart contract code.
 
 - `FundMe.sol` contains the crowdfunding contract.
 - `PriceConverter.sol` contains functions for converting ETH values into USD values.
 
-### `script`
+### `script/`
 
 This folder contains scripts used to deploy and interact with the contract.
 
 - `DeployFundMe.s.sol` deploys the `FundMe` contract.
-- `HelperConfig.s.sol` selects the correct price feed configuration.
+- `HelperConfig.s.sol` selects the correct price-feed configuration.
 - `Interactions.s.sol` contains scripts for funding and withdrawing from `FundMe`.
 
-### `test`
+### `test/`
 
 This folder contains the tests.
 
-- `unit` contains tests for individual contract functions.
-- `integration` contains tests for a complete workflow.
-- `mocks` contains fake contracts used during local testing.
+- `unit/` contains tests for individual contract functions.
+- `integration/` contains tests for a complete contract workflow.
+- `mocks/` contains fake contracts used during local testing.
+
+### `lib/`
+
+This folder contains external libraries used by the project, including:
+
+- `forge-std`
+- `foundry-devops`
+- Chainlink contract libraries
+
+## Getting Started
 
 ## Requirements
 
 To run this project, you need:
 
-- Git
-- Foundry
+- [Git](https://git-scm.com/)
+- [Foundry](https://www.getfoundry.sh/)
 - A terminal
 - A testnet wallet if you want to deploy to a testnet
+- Testnet ETH if you want to deploy to a testnet
 
-You can check whether Foundry is installed with:
+Check whether Git is installed:
+
+```bash
+git --version
+```
+
+Check whether Foundry is installed:
 
 ```bash
 forge --version
 ```
 
-If Foundry is not installed, follow the official installation guide:
+If Foundry is not installed, follow the [Foundry installation guide](https://www.getfoundry.sh/).
 
-[Foundry Installation Guide](https://www.getfoundry.sh/)
-
-## Installation
+## Quickstart
 
 Clone the repository:
 
@@ -118,61 +178,57 @@ Clone the repository:
 git clone https://github.com/ven01z/foundry-fund-me-f23.git
 ```
 
-Enter the project folder:
+Enter the project directory:
 
 ```bash
 cd foundry-fund-me-f23
 ```
 
-Install the dependencies:
-
-```bash
-forge install
-```
-
-If the project does not already contain Foundry DevOps, install it with:
-
-```bash
-forge install Cyfrin/foundry-devops --no-commit
-```
-
-## Build the Project
-
-Compile the contracts with:
+Build the project:
 
 ```bash
 forge build
 ```
 
-If the build succeeds, the Solidity contracts compiled successfully.
-
-## Run the Tests
-
-Run all tests:
+Run the tests:
 
 ```bash
 forge test
 ```
 
-Run the tests with detailed information:
+If the build and tests complete successfully, the project is working correctly.
+
+### Installing Dependencies
+
+The required dependencies are already included in the project. If they are missing, install them with:
 
 ```bash
-forge test -vvvv
+forge install
 ```
 
-Run one specific test:
+If Foundry DevOps is missing, install it with:
 
 ```bash
-forge test --match-test testWithdrawFromASingleFunder
+forge install Cyfrin/foundry-devops --no-commit
 ```
 
-Run the integration test:
+## Usage
+
+## Build the Project
+
+Compile the Solidity contracts with:
 
 ```bash
-forge test --match-test testUserCanFundAndOwnerWithdraw -vv
+forge build
 ```
 
-## Unit Tests
+If the command succeeds, the contracts have compiled successfully.
+
+## Testing
+
+This project contains unit tests and integration tests.
+
+### Unit Tests
 
 The unit tests are located in:
 
@@ -180,11 +236,11 @@ The unit tests are located in:
 test/unit/FundMeTest.t.sol
 ```
 
-These tests check individual pieces of the `FundMe` contract, including:
+The unit tests check individual parts of the `FundMe` contract, including:
 
 - Whether the minimum funding value is correct.
 - Whether the correct address becomes the owner.
-- Whether the price-feed version is correct.
+- Whether the Chainlink price-feed version is correct.
 - Whether insufficient funding reverts.
 - Whether a user's funded amount is recorded.
 - Whether a funder is added to the funders array.
@@ -192,7 +248,25 @@ These tests check individual pieces of the `FundMe` contract, including:
 - Whether the owner can withdraw from one funder.
 - Whether the owner can withdraw from multiple funders.
 
-## Integration Test
+Run all tests:
+
+```bash
+forge test
+```
+
+Run the tests with detailed traces:
+
+```bash
+forge test -vvvv
+```
+
+Run one specific unit test:
+
+```bash
+forge test --match-test testWithdrawFromASingleFunder
+```
+
+### Integration Tests
 
 The integration test is located in:
 
@@ -200,33 +274,51 @@ The integration test is located in:
 test/integration/InteractionsTest.t.sol
 ```
 
-It tests the complete process:
+The integration test checks the complete workflow:
 
 1. Deploy the `FundMe` contract.
 2. Give ETH to a test user called `alice`.
 3. Have `alice` fund the contract.
 4. Use the withdrawal interaction script.
-5. Check that the `FundMe` contract has no ETH left.
-6. Check that Alice lost the amount she funded.
-7. Check that the owner received the funds.
+5. Confirm that the `FundMe` contract has no ETH left.
+6. Confirm that Alice's balance decreased by the funding amount.
+7. Confirm that the owner's balance increased by the funding amount.
 
-Run the integration test with:
+Run the integration test:
 
 ```bash
 forge test --match-test testUserCanFundAndOwnerWithdraw -vv
 ```
 
+Run the test with maximum trace details:
+
+```bash
+forge test --match-test testUserCanFundAndOwnerWithdraw -vvvv
+```
+
+## Test Coverage
+
+To generate a test coverage report, run:
+
+```bash
+forge coverage
+```
+
+The report shows which parts of the contracts are reached by the tests.
+
 ## Deploy Locally
 
-First, start a local Anvil blockchain:
+Anvil is a local Ethereum blockchain included with Foundry.
+
+Start Anvil:
 
 ```bash
 anvil
 ```
 
-Leave Anvil running in the terminal.
+Keep Anvil running in one terminal.
 
-In another terminal, deploy the contract:
+Open a second terminal and deploy the contract:
 
 ```bash
 forge script script/DeployFundMe.s.sol \
@@ -234,11 +326,24 @@ forge script script/DeployFundMe.s.sol \
     --broadcast
 ```
 
-Anvil provides test accounts with test ETH, so this does not use real money.
+Anvil provides test accounts with test ETH, so this local deployment does not use real money.
 
-## Interact with the Contract
+## Interaction Scripts
 
-After deploying, you can run the funding script:
+The interaction scripts are located in:
+
+```text
+script/Interactions.s.sol
+```
+
+The project contains two interaction scripts:
+
+- `FundFundMe` sends ETH to the `FundMe` contract.
+- `WithdrawFundMe` withdraws the contract balance to the owner.
+
+### Fund the Contract
+
+After deploying locally, run:
 
 ```bash
 forge script script/Interactions.s.sol:FundFundMe \
@@ -246,7 +351,11 @@ forge script script/Interactions.s.sol:FundFundMe \
     --broadcast
 ```
 
-To withdraw the funds:
+This sends ETH to the most recently deployed `FundMe` contract.
+
+### Withdraw the Funds
+
+To withdraw the balance from the contract, run:
 
 ```bash
 forge script script/Interactions.s.sol:WithdrawFundMe \
@@ -254,19 +363,91 @@ forge script script/Interactions.s.sol:WithdrawFundMe \
     --broadcast
 ```
 
-The interaction scripts use Foundry DevOps to find the most recent `FundMe` deployment.
+The withdrawal can only succeed when the account making the call is the owner of the `FundMe` contract.
 
-## Chainlink Mock
+## Interacting with Cast
 
-When testing locally, the project uses:
+Foundry's `cast` tool can also be used to interact with a deployed contract.
 
-```text
-MockV3Aggregator.sol
+To fund a deployed contract:
+
+```bash
+cast send <FUNDME_CONTRACT_ADDRESS> \
+    "fund()" \
+    --value 0.1ether \
+    --private-key $PRIVATE_KEY \
+    --rpc-url $SEPOLIA_RPC_URL
 ```
 
-This is a fake Chainlink price feed.
+To withdraw from a deployed contract:
 
-Using a mock means the tests do not need to connect to a real Chainlink contract. It makes the tests faster and more predictable.
+```bash
+cast send <FUNDME_CONTRACT_ADDRESS> \
+    "withdraw()" \
+    --private-key $PRIVATE_KEY \
+    --rpc-url $SEPOLIA_RPC_URL
+```
+
+Replace:
+
+```text
+<FUNDME_CONTRACT_ADDRESS>
+```
+
+with the address of the deployed `FundMe` contract.
+
+## Deploying to a Testnet
+
+This project can be deployed to a network such as Sepolia.
+
+### Create Environment Variables
+
+Create a `.env` file in the project root:
+
+```bash
+SEPOLIA_RPC_URL=your_rpc_url
+PRIVATE_KEY=your_test_wallet_private_key
+ETHERSCAN_API_KEY=your_etherscan_api_key
+```
+
+The variables are used for:
+
+- `SEPOLIA_RPC_URL`: Connecting to the Sepolia network.
+- `PRIVATE_KEY`: Signing transactions.
+- `ETHERSCAN_API_KEY`: Verifying the contract on Etherscan.
+
+Use a development wallet that does not contain valuable funds.
+
+Never commit your `.env` file, private key, or API keys to GitHub.
+
+### Load Environment Variables
+
+Depending on your terminal, you may load the variables with:
+
+```bash
+source .env
+```
+
+### Get Testnet ETH
+
+Get Sepolia ETH from a Sepolia faucet before deploying.
+
+You can use the [Chainlink faucet](https://faucets.chain.link/) or another trusted Sepolia faucet.
+
+### Deploy and Verify
+
+Deploy the contract and verify it on Etherscan:
+
+```bash
+forge script script/DeployFundMe.s.sol \
+    --rpc-url $SEPOLIA_RPC_URL \
+    --private-key $PRIVATE_KEY \
+    --broadcast \
+    --verify \
+    --etherscan-api-key $ETHERSCAN_API_KEY
+```
+
+Only use testnet ETH when experimenting with this project.
 
 ## Gas Snapshots
 
@@ -276,27 +457,27 @@ Foundry can measure gas usage with:
 forge snapshot
 ```
 
-This creates or updates:
+This creates or updates a file called:
 
 ```text
 .gas-snapshot
 ```
 
-Gas snapshots help compare gas usage after changing the contract.
+Gas snapshots help compare gas usage before and after making changes to the contract.
 
-For example, you can compare whether a new version of `withdraw()` uses more or less gas than the previous version.
+For example, they can help determine whether a new version of `withdraw()` uses more or less gas.
 
 ## Chisel
 
-Chisel is Foundry's interactive Solidity tool.
+Chisel is Foundry's interactive Solidity command-line tool.
 
-Start it with:
+Start Chisel with:
 
 ```bash
 chisel
 ```
 
-You can use it to quickly experiment with Solidity:
+You can use it to experiment with Solidity expressions:
 
 ```solidity
 uint256 cat = 1;
@@ -322,17 +503,19 @@ forge fmt --check
 
 ## Security Notes
 
-This is an educational project, not a production-ready financial application.
+This project is for educational purposes and is not a production-ready financial application.
 
 Important things to remember:
 
 - The owner can withdraw all funds from the contract.
 - The contract depends on a Chainlink price feed.
 - The correct price-feed address must be used for each network.
+- The price feed must return valid and reliable data.
 - The withdrawal function loops through the list of funders.
 - A very large number of funders could make withdrawal expensive.
 - Testnet ETH has no real value, but mainnet ETH does.
-- Never commit private keys or API keys to GitHub.
+- This project has not received a professional security audit.
+- Do not use this contract to hold real funds without further testing and auditing.
 
 ## Protecting Secrets
 
@@ -347,7 +530,13 @@ cache/
 out/
 ```
 
-Never place a real private key directly inside a Solidity file, script, README, or GitHub repository.
+Never place any of the following inside a Solidity file, script, README, or GitHub repository:
+
+- A private key.
+- A wallet seed phrase.
+- An API key.
+- Passwords.
+- Other secret information.
 
 ## Course Reference
 
